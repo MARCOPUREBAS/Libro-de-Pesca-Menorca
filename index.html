@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peixos Menorca 2025</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e8ba3 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { background: rgba(255, 255, 255, 0.98); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin-bottom: 30px; text-align: center; }
+    h1 { color: #1e3c72; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+    .subtitle { color: #5a6c7d; font-size: 1.1rem; margin-bottom: 20px; }
+    .controls { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    button { padding: 12px 30px; font-size: 16px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    #toggleAll { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; }
+    #toggleAll:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30, 60, 114, 0.4); }
+    .search-box { width: 100%; max-width: 400px; padding: 12px 20px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 12px; transition: all 0.3s; }
+    .search-box:focus { outline: none; border-color: #2a5298; box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1); }
+    #fishList { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; list-style: none; padding: 0; }
+    li { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); cursor: pointer; transition: all 0.3s ease; position: relative; }
+    li:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
+    .card-header { padding: 20px; background: linear-gradient(135deg, #f0f4f8 0%, #ffffff 100%); border-bottom: 3px solid #e8f0f8; }
+    li span { display: block; font-weight: 600; font-size: 1.1rem; color: #2d3748; margin-bottom: 8px; line-height: 1.4; }
+    li small { display: inline-block; color: white; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+/* CONTENEDOR RESPONSIVE DE LA IMAGEN */
+.img-container {
+  width: 100%;
+  height: auto;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden; /* evita desbordes */
+}
+
+/* IMAGEN RESPONSIVE SIN RECORTES */
+li img {
+  max-width: 100%;
+  max-height: 260px; /* Ajusta la altura máxima del contenedor */
+  width: auto;
+  height: auto;
+  object-fit: contain; /* Nunca recorta la imagen */
+  display: none;
+  transition: opacity 0.3s;
+  
+}
+
+/* CUANDO LA FOTO SE ABRE */
+li img.show {
+  display: block;
+  animation: fadeIn 0.5s ease;
+  opacity: 1;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+    .click-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(30, 60, 114, 0.9); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    li:hover .click-hint { opacity: 1; }
+    .stats { background: rgba(255, 255, 255, 0.98); padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin-bottom: 30px; text-align: center; color: #2d3748; font-weight: 600; }
+    @media(max-width: 768px) { h1 { font-size: 1.8rem; } #fishList { grid-template-columns: 1fr; } .controls { flex-direction: column; } .search-box { max-width: 100%; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🐟 Peixos de Pesca – Menorca 2025</h1>
+    <p class="subtitle">Guia completa de talles mínimes per a pesca recreativa</p>
+    <div class="controls">
+      <button id="toggleAll">📸 Mostrar / Ocultar totes les fotos</button>
+      <input type="text" id="searchBox" class="search-box" placeholder="🔍 Cercar peix...">
+    </div>
+  </header>
+
+  <div class="stats">
+    Total espècies: <span id="totalCount">0</span> | Visibles: <span id="visibleCount">0</span>
+  </div>
+
+  <ul id="fishList">
+    <!-- Añadimos todas las especies importantes con imagenes cuando disponible -->
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Engraulis_encrasicolus_Gervais.jpg/250px-Engraulis_encrasicolus_Gervais.jpg">
+      <div class="card-header"><span>Aladroc / Boquerón</span><small>+ 9 cm</small></div>
+      <div class="img-container"><img alt="Aladroc"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Boga_%28Boops_boops%29%2C_franja_marina_Teno-Rasca%2C_Tenerife%2C_Espa%C3%B1a%2C_2022-01-08%2C_DD_99.jpg/250px-Boga_%28Boops_boops%29%2C_franja_marina_Teno-Rasca%2C_Tenerife%2C_Espa%C3%B1a%2C_2022-01-08%2C_DD_99.jpg">
+      <div class="card-header"><span>Boga</span><small>+ 11 cm</small></div>
+      <div class="img-container"><img alt="Boga"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Trisopterus_minutus_Gervais.jpg/250px-Trisopterus_minutus_Gervais.jpg">
+      <div class="card-header"><span>Capellà / Capellán</span><small>+ 11 cm</small></div>
+      <div class="img-container"><img alt="Capellà"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Spicara_smaris_2.jpg/330px-Spicara_smaris_2.jpg">
+      <div class="card-header"><span>Gerret i xucla / Caramel / Xucla</span><small>+ 11 cm</small></div>
+      <div class="img-container"><img alt="Spicara"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Mullus_surmuletus005_1.jpg">
+      <div class="card-header"><span>Moll / Salmonete</span><small>+ 11 cm</small></div>
+      <div class="img-container"><img alt="Moll"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbq68iCWSAtMGMqB88SihpE0CbgzITqd3CGQ&s">
+      <div class="card-header"><span>Sardina</span><small>+ 11 cm</small></div>
+      <div class="img-container"><img alt="Sardina"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Diplodus_annularis_Minorca.jpg/250px-Diplodus_annularis_Minorca.jpg">
+      <div class="card-header"><span>Esparrall / Raspallón</span><small>+ 12 cm</small></div>
+      <div class="img-container"><img alt="Esparrall"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Breca_%28Pagellus_erythrinus%29%2C_franja_marina_Teno-Rasca%2C_Tenerife%2C_Espa%C3%B1a%2C_2022-01-08%2C_DD_13.jpg/250px-Breca_%28Pagellus_erythrinus%29%2C_franja_marina_Teno-Rasca%2C_Tenerife%2C_Espa%C3%B1a%2C_2022-01-08%2C_DD_13.jpg">
+      <div class="card-header"><span>Pagell / Breca</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Pagell"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Micromesistius_poutassou_Gervais.jpg/250px-Micromesistius_poutassou_Gervais.jpg">
+      <div class="card-header"><span>Maire / Bacaladilla</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Maire"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/a/a1/Sarpa_salpa%3B_Goldline_%28cropped%29.jpg">
+      <div class="card-header"><span>Salpa / Salema</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Salpa"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.conxemar.com/wp-content/uploads/2022/12/trachurus_mediterraneus_sw.jpeg">
+      <div class="card-header"><span>Sorell / Jurel</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Sorell"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB2XtqKXe3cMBlz1s6BtrdOhttmRBFNEfywA&s">
+      <div class="card-header"><span>Bruixa / Gallo</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Bruixa"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Diplodus_cervinus000.jpg">
+      <div class="card-header"><span>Sarg reial / Sargo breado</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Sarg reial"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Oblada_%28Oblada_melanura%29%2C_%C4%8Airkewwa%2C_Malta%2C_Malta%2C_2021-08-24%2C_DD_26.jpg/1200px-Oblada_%28Oblada_melanura%29%2C_%C4%8Airkewwa%2C_Malta%2C_Malta%2C_2021-08-24%2C_DD_26.jpg">
+      <div class="card-header"><span>Oblada</span><small>+ 15 cm</small></div>
+      <div class="img-container"><img alt="Oblada"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cpelpalmar.com/wp-content/uploads/cpescadoreselpalmar.com/2014/11/Mugil.jpg">
+      <div class="card-header"><span>Llissa / Lisa</span><small>+ 16 cm</small></div>
+      <div class="img-container"><img alt="Llissa"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbZ9PJnk7rryoHy3bbJBlmMkc_Wwt66VuWlA&s">
+      <div class="card-header"><span>Castanyola / Japuta</span><small>+ 16 cm</small></div>
+      <div class="img-container"><img alt="Castanyola"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.conxemar.com/wp-content/uploads/2022/12/pagellus_acarne_bon.jpg">
+      <div class="card-header"><span>Besuc / Aligote</span><small>+ 17 cm</small></div>
+      <div class="img-container"><img alt="Besuc"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Diplodus_puntazzo06.jpg">
+      <div class="card-header"><span>Morruda / Picudo</span><small>+ 18 cm</small></div>
+      <div class="img-container"><img alt="Morruda"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://pecesmediterraneo.com/wp-content/uploads/2019/03/pagrus_pagrus.jpg">
+      <div class="card-header"><span>Pàguera / Pargo</span><small>+ 18 cm</small></div>
+      <div class="img-container"><img alt="Pàguera"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://canalmarmenor.carm.es/wp-content/uploads/mojarra3-scaled.jpg">
+      <div class="card-header"><span>Variada / Mojarra</span><small>+ 18 cm</small></div>
+      <div class="img-container"><img alt="Variada"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.conxemar.com/wp-content/uploads/2022/12/scomber_scombrus_2_sw.jpeg">
+      <div class="card-header"><span>Verat i bis / Caballa</span><small>+ 18 cm</small></div>
+      <div class="img-container"><img alt="Verat i bis"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://sumalisa.com/FTP/imgs/1400.jpg">
+      <div class="card-header"><span>Lluç / Merluza</span><small>+ 20 cm</small></div>
+      <div class="img-container"><img alt="Lluç"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Lithognathus_mormyrus000_1.jpg">
+      <div class="card-header"><span>Mabre / Herrera</span><small>+ 20 cm</small></div>
+      <div class="img-container"><img alt="Mabre"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.conxemar.com/wp-content/uploads/2022/12/sparus_aurata_bon.jpeg">
+      <div class="card-header"><span>Orada / Dorada</span><small>+ 20 cm</small></div>
+      <div class="img-container"><img alt="Orada"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQA158ECOe3Ia27XyktVrNz24REYcumjzxIJg&s">
+      <div class="card-header"><span>Palaia / Lenguado</span><small>+ 20 cm</small></div>
+      <div class="img-container"><img alt="Palaia"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/2/2c/Sargo_com%C3%BAn_%28Diplodus_sargus%29%2C_Madeira%2C_Portugal%2C_2019-05-31%2C_DD_29.jpg">
+      <div class="card-header"><span>Sard / Sargo</span><small>+ 23 cm</small></div>
+      <div class="img-container"><img alt="Sard"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.lamardepesca.com/wp-content/uploads/aguja.png">
+      <div class="card-header"><span>Agulla / Aguja</span><small>+ 25 cm</small></div>
+      <div class="img-container"><img alt="Agulla"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxQTEhISExQVFhUWGRoaGRgXFxoZGRoiHRgYGhcbFxgYHSogGRooHRYYIjEiJSorLi4uFx8zODMtNygtLisBCgoKDg0OFRAQFi0dHR0rKysrLSstLS0tLS0rLS0tLS0rLS0rLSs3Ky0rLTctLS0tKy0tLS0tKysrKystKysrK//AABEIAJEBXAMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAAAQYDBAUCBwj/xAA/EAABAwIDBQUECAQHAQEAAAABAAIRAyEEEjEFQVFhgQYicZGhEzJCsQcUUmJygsHwIzOS0RVDU6Ky4fGDc//EABgBAQEBAQEAAAAAAAAAAAAAAAABAgME/8QAGxEBAQEBAAMBAAAAAAAAAAAAAAERAhIhQTH/2gAMAwEAAhEDEQA/APuACQgUoIhIUogiEhSiCISFKIIhIUogiEhSiCISFKIIhIUogiEhHGFKCISFhbXmoWC+US7lPujx3+EcVnQRCQpRBEJClEEQkKUQRCQpRBEJClEEQkKUQRCQpRBEJClEEQkKUQRCQpRBEJClEEQkKUQQFKgKUBERAREQEREBERAREQEREBEVfrdou++mxskOLZJta3zBQeu0m0sjqNJolz3hxH3WkE+ZgdSsG2u0Tqbe6IcbAakk6Dh/0CVxsDW9rVqYt5n4ac6QJg8hq7ryXLwdb6xWNY3pskMB+I73Hxjo0KCwbD2j9VY815h3fzakmOGt7AdFZMNXhgqPN3wY1ifdaOJ/WSqC/Fe2cXuP8Jl5NsxGp/CNy6/ZragLnPrHLSY3+EXWa3UEng4g25W3oLoFKxYapmaHQQDcA6xukbvBZVQREQFr4vG06QzVHtYOLiB/6uFt/tU2kCyjD6kxOrQeAj3iN8WG87lSsdUc456zjUqu3a5en6D1UtH07AbUo1p9lUY+NcpmFuL4li8+Hc2pThtUEEDfbjGg5L6T2Q7WU8azc2q33mTwiSJvEkXSUWRERUEREBERAREQEREBERAREQEREEBSoClAREQEREBERAREQEUErl43tJhKVqmIotPDOCfIGUHVRVLG/SPgKY/muf8AgpvPqQAuNivpaojMKeHrOggd4tZcxG8nePNTYL1tbGCjSfUO4H9/r0Xy7H7TFOgXT36pyN4mR3z5HXiSsHaLtxXxbDRFKnTaSAe+5xvYnQCNR1VP2hXrPdTc94aKbXZQ1o+Ey4md5MKauLftvbGSmzDMs57R3Rq1vA/edw4QOK9VMSW5MIwS+AKgb8INyydJi7juVLNOoKrqwrP9qC1092LwJ0+EXtwU4Z9dprQ54NUlhNpuZEmLB1yAN0KaYuzcW2q4U2kGjTkuIsHFvPcwcf8AxbVOp7YtvFJt2g2Bj438AN0+KoOEa8UzSa5wYYcbfA3e62k6+C2Riqzmhmd2VxnKQL/6bHW1MSBorKmPvOxtoiswPEBujb3dHvEDcOHnwXSXwbZnbDFYV2ZpY7MIh7Dla1gJeRB7sHXjZdml9LWIDM76FOA1rie82M1miJNynkuPrOMxTaTS95AaFQtpdp6lYOgllJxhrW2e/lm1Ai5O4czCqnaHtvUxLslRmRjXgPDXXIiQ0SIAO88o0XIq9onOl7Gw9xyMiMlJlyCOJt11TyMWkVsrsjIdVIvuZTbuHEeGrt6ltQAubTMv+Oodx4SN/wB0XVWpbSGZ1Om7ugTUrOOXN9rKTcN3T7x3QtmntAOYSw+yoNsXkZS7k2JyzwEuO9VHSxhAJZT7z95O78R0b4a+C4tdpokljy2pI9yQdZ3XjxW5h65c3+EPZsGtR0AxxvZk9XH0XmjTaQRTbm3uqOBA8QDu5ujwWcH0XsL20+tA0qoy1GgCdzrXPJXVfnulV9k72rHOztu0t084v8l9V7C9sG4tvs3w2u0Xb9ocQrKLeiItAiIgIiICIiAiwYvGU6Tc1R7WDi4gfNVba/0hYalOTNVO4jut/qdc9AUFwXirWa0ZnODRxJAHmV8ixv0gY2vai1tIcWiSPzO/sFWNoYl1Qg161Ss4mA0OLr7hw8li9tTl99wO0KVYONJ7XhpglpkTwlbS4PY3YjcLhmtDS1zu8+SCZO63D+67y1GUBSoClUEREBEXO2vtyhhm5q9RrJ0BMuP4Wi56BB0VixOIbTaXvc1rRq5xAA8SVQNo9u69WRhKORv+pV18QwGB1PRVbFPbUfmxuIdVM2bqB+X3R0G5B9Axv0gYZpLaIfXd9wQ3+t0A9JXGxfajG1v5IbTGkNZndJNu86wtyXEpdqsPRtTosJAMOeZg21GgsuhgO1wrEAw0b8mVxAg7hE3gjhlUw1w9p4bFViDVq1nyQMrictxcZRA0vpuWnh+yVTJY5XCYAEEkN7ugvmDtFe8PtRkBuYSHFzzEmC6WutIBzuI8Cvb9oAiWl+Yd5oDJILHEGTEHuap4w2qWzse2B7R2do9nv1aSc5Hi+y61DspSaZcRZ9SnUJMCXg94HcRYD8C79Oq1rwC2o4SQJYYykTTB4d9xhSzEBzbsqEudlPdg92TJnSTfqr6iOCzs5SytbYZmBhg3aWXaPzHdzTGdmaZLnCZJbU42Iio2ZjugjrK71LFGHP8AY1MxyvA7sl0HMRfQWB3o7GuDv5VUt9oRo27X8L6EneqOK3YFJrXSxxaw5dLmkbkkcTLegWN/Z9skZXS8uYZPu1MjvZvkDQMjqF2ziXkCabyZyPFu9FqUCdNFruxhyuDmuBcNcsmWT7RwtviOiUVOvs5gBsW03Nl/Ki2G1G+JffqV4+rPhxgmrIOUjSrEYcX3CnchWzE4im+7gQCBVLcp92ABTB3kugwsNam13dFVsmW5p96pUEioPwg+qyqrt2a1zjBLmS4yd9NoDsXbeXOt5LHV2cMxfDTlDXkHT+NDKDeHczdIVjZgwSxzQ0U75QDcNpjvs/M/0Kg4GBm7pcHTEauxFmzxDJ8igqeI2a0ZabyMjS7D1H78rf5lSeZIb+YrQxOFzQ1oOdwgsFv4rbU262GTvHk1XZ+yMzcgiYyT/wDh/EcT+J0Bc12DktcSc5La5i0Bwy1yDwFIhv8A9BxT9VVjs/m7KcrpgHuPME6e8XwBwB8V6ds93czfA173tkwwthuVo0JMa8irJisCJN8sCpbgyQ/DDqRYc3L1hRq+o0FrHNr1Mup9s0BrAOTh/wAVPGGq9WxFVpbmuKbQcpHcbm9z3bF5uONlst2xOb2zC4N0ptcGMbfeIubXJkrovwjtIOa4g76oM02g72sYQenIrz/hjN4Lg6CXRfLUBabcTUnomUa311jgc7gy8Cmxtz4ud8yei7XZHYGIqVm4jDw3I4S7N3bRLXEXdY3AXGOypABJkkagXe4ltQaaNEDovGGwtSic9Oo9gLiSWOIhrTkeerhPgeSyY/QFIGBJBMXIsJ3wF7Xxej2q2hSM+0LwPhqAG41E62bDiurT+k+swTUo03AAkkOcywMTedbEcQVryMfU0Xz+h9KlEzmw9YRrBYYgTvcN11t0/pLwpmWVxBIPcbu10ersTF1RUTEfShhwSG0a7iJ3MaLCbkvsIXD2n9IGLqhwpUPYtHxTmf5xDfD1TTH0ba+26GGE1qgbwbq4+DRcqj7a+kGo4TQaKVM2FSoJc7kxo1PhPRUplQ1HFziXPO9wLiehu7rDfFbYrtaZLx7TSR/FreDQ3u0xyt4oMO0MfVec9RxaT8VW7z+Fl4C1KNIOMspuqu+0+zR0H6lesSwg5gxrJ+PEOBefBok+crTrVgbOqVanJgys/RZrUbeMeNKtYcmUxIHRtvMq09gezza9QVDScKbL53H3jIgNA13yZVf7I7J+s4llIMytu5znCbDlx3dV9zwWEZSY2mxoa1tgApJvstZgFKIujKApUBYcZi2UmF9Rwa0ak/u5QZ1pbV2tRwzDUrPaxvPU8mjUnwVP2522qFp+rtaxsWfUu48C2mNPFx6Ki7Qa52WvWqOq1M7buDjlbv3ADhZPYsO0+3mLxj3UdnUSxo1qOjNHG9mepVKrvrUX564a90nM8uc8kb+84fKfJbZx9duDqtwr2MqF5Lw4Nh474LJdYGC2J4GFVcMK7KTxWaGBwaGNJEkhzSHADQZQ654xvXKd1rF/wm0c7rERvpuAMaRce8FZauHpBgcKVMSC4w1o03eJXzrs6H56AINqfe9cvXLHkvpn1fLRBqTEHu/Lw92Oq62sx897RbKbVeWtaGOe1403tyx0uQfEKn7IaaRdnzSDG8RIGhF19E2mzKaOs+0d5EN3rkbR2Tm9qwgWzDMdCAbTvFy1SFb+xe27aDhSr5n4dwhlZ0WfvbULfhkAzyuF9CoYum67X90loabaObDyDwJm/JfB8DIcaZHtKT+65ukn7pG8bjxX07sZgPYCpSbUc+nGVmeO6Td4HIDhaRO9az6mre4TADgc7CJFpcw/wwOBi6mpVAc5/d7zWVBPEQAPHUytRuMdZ3dEZajYG9zcsEDWGtJ6rFTrcQMoLgHO4PBAjkAApqtx9X2c7zTedN7Hm5njmt0WEYskGQAO8D+Thx3BaL9pAgNBLgWAQwcCcok21v1Xl9Wo4HK1rBY37xhvIKeUMdF1clsaPIB4Q+Z9B8l5c0ZnOiGiKo45QXAtHCTfqtKthHOkuqu4kg5WyfwglZNlVcpYCSbXGtgR7OSeZ9U3THQDw0ZjBLHCoRGuezWjdv8AQKPYZoYQJzFjnfekPzDj3RErG5xaWyJIztO8F3weQb6ry17iJB3cPiYQKh8dyitT6mwvBDBA/iAaRkMEDm6F5dsuCcjiMvdEOPvVYym/2ZEeK6jXtILhYNPtI4gjKxp8dfEBYXOyAtGoBAiLvnMI8AfRVHP/AMOdeKh4CY91kCqTxJEjnZeKbDDW9yHuey4LSW1YcSNco7ob5LfrMEOh0Xa1u85XR7Q+d/yrUqEljoglzIng2k75mJU1XOfSce85odJD3EOuG0CGtABFyZ+awswoaS003gZnucAAZLi1+HbM7nA+S6oqNLi7KQ1xa+32CMjR1dBheHVHAA5hIyvdI1c05Wt8jPQINSnQYCx5c4GWlsg+850Yh/pHLqs5oUSTlMCXjXSAHUG9C0mOYW3kMtp5rZnUg61g8BzyZ8IUVy2zrGR7SIHwHLB8QmjnmkXfZ0aL/C7Ea+ADh6lc92DMHM05HN3fY9zKPxVBK69TB0yHSwZgHdXOdmZ45Q4LFUwVPM4iSGAw2dcsFg13uc4zyWojnVcIHNDS85u5JI+Ko3LXPMNYB4SsB2cLEQ4tAcQZ3H2LB/SA9dRuy6cZXC4JEhx/zDmcfyiOi9MwbPeESSHXkag04/K0ByI4J2XkzBpDsk5ZEyaboaD+M5j+VZ6GzmCAS0ickxYhhJz/AJ3w1dSnsxoEjPIPuyblkBl+GVZG7MaB3ZgGxk7u9TJ/NaOSlitChgrTDZdeCLCe8W2++BT8Aujh6RiQQJ11nvAuLiJgGCT0Xk7PvADpJPxReQRI4e0zFeq2Ga4FoNQAixza8TlHIuF+PJMNUztTXy1XNBnvEkSDrFjJEnxtwC52FxBHLxqho/ppt/VbnaHBvZWcMxJuSQHEmTMnjrqtChUdMB4J4FwafKowKarea4aj2I53cfUrPhg6q8UmVW5zAADQJJNh7t1omnrn9o3/AObHjzbC29k1/ZV6dem5jnU3B0OaWEwRI5WWLWo+19kdg/VKDWOIfUN3u4k7gTeAu4tXZuOZWpsqsILXAGxmOIPMLaXSMCIiogKldunhz2RUbNKc1N8hpzAEEO0zDnxV1C4219jh7vaCZ3gannBsd1uSlFKwjqNcAABrxNrHy4/Pkt6nsYOkBwI4bxyIWfE7CDiSMpI35Mrh45bg9FpVcPUBl7RVj4h74HAlsFw/cKTrDHMxnYgunK4NngSCeVrHTeuYzsI8HWSCBLjMenJWnZm0XOrMAzCZBBdIjKZ5SIC6GOxMHfIJiOsn5eSW/YrnbG2JSw2bO7M6LQOGsfJets7UgSBY+hAzX5GAFpYvaXen5agiD5GP3C4+McXktY0guJBdrqIgcdTHgoMuJpl5w4cYu4kxMe6P0PktilgQ8EhpIcSRv1Jc0HmQZ9FvUsDkc2mCMzGAX+06STzgEeS3DXbSYWUvggOfEhpvlH3qhkQ0dYhXn6dT8VSphWtMMa3OSAYGhi/5vkBOq7dmtDQHEU7Q0d4mwcP1PjyWPA4M5tO9G8zckQOZkyTv6X7zGQRcjdccW3P9Q9Fq1mRWRth1NoBa1pAI0zPIOkiwEC1z0Wj/AIm6qeMaT3jwsAIt4dV0+29MAUagF3th1+EQfIx0Vcw2Y+HC8ei8vfXW46yTHfw7TYOPLWNDMkDj4rqUa0aFk9Xm+ggTG4rkYKmTAGUXBsLeUfqu5hnQQxtQucdzW2HM2iAt88s2leoSAxznOzWO4AbzGvgvWHfDSSLkZjbQssGjnYeq2G7NmPiLt/rf83otmnhDJdAkuzx4CCOl13kxlptrm35Xk7u9Z3QSfRe3PjjlBLfBp949Ss7Nnloy2tLej9/n6LJ9V47xHEyzT9fNMNaQBBjUiWnxiWDmACpzRlj7pB6w955RmW/9U1deSAdLzoY+8ZK8OwJuBr7g8DcDwt8kwaYlxgR/mU2/8ifQeqxMAInQWf8AlaMpHoT0W0cIb5TBcG5fyE5z1WZmCgngbN/CRf8AQJkHIbhHTBdMt4aZTNL0HUr0/DmTN+9J5moI9F1Pq7tcsWk/ls1vUKPqZ03w4dfeb5ApkRyDRc60XIDZn7JM9SVlZREkkWzA9C2Pn810zg75h4DhcAl3zC2KeDm0WNh4aj1V9DjUcMd9yINxvkg/7VJoZSDDbSdDowm3XMFYqWEG/fJPW36ALSxWOptzsaA+o0XZxkajjoFL0uOYMC8giABESZ394/26LOzAza5N/db9oDNppovWH2uX1Adxj+GROUix01H7srjQbDRIAMXA06KS6YrVLZD9zXazcgboFlmbsd4AGXdGoVjRUVbEbNcBJafKfUSuNjsO2m17i4NAG8gjW9tfi05L6EtXG7OpVWltSm1w5j5HUKXR8GrVM7i4g30kE2GmlwoOFeG54zs5gVqfU++1fRNt/R+QS/Cu5+zqE/7Xi4KrtWk+kYqMfRq7i7uOP4ag7lQfdeOqmLqqik1120y0jfRfmb1Y7vBYnVSLSHjhOVw6FdLG1Bm79PK77dIZXeLqRs7xasDqYeD7tUcW++PFju8s9RqVd/oo23TaX4WSC85m5o1Au1t72E6bivp6/OOFJp1GvovhzTIgwRHI/wB1+gNi7SZiKLKrHSCBO4gxcEbirxfjNbyIi2iApUBSgw18K1/vCTx0PmLrn4zYubR5B5gH1EFdZEwVQ7Lr0jmDWVOcCfSD81rV6u59AA83kD1Cui8uYDqJ8VMHz/6tJluHZfiQ6f8AeFsUaDwBLXsH3BTaPPMT6q21dk0XasA8LfJaVTs5TmWuc3oCPUSmCtuAbIaDe7spzPd+J+jR+7LNh6IcAYECQ2B3Gzrk/wBSod7tB8+tW2A42zNcODpjy0Xulg6rPgzHiCDbgAdB4Jg1qGzsskjp8r7zqZ4lZHYWIjQWvyMifNbbKhHvNeB+E/opNdh3xrqPPXUorjY/Yja0Bw0nTnrHI5QudU7IBvuOgcHMB8jZXCm9toI6LI4ti5+Xqs2SrFSp9mw0957nBpE7gZ1sOfNdTBbPbTblAgiRYR+yuw0eGloXkHh05nerPSNFtOSTe/u8hG7hdZhTaTJniPA6jqVnAjSLaeG9ehGn74+iupjD7Hj+E/ohYNYExOu8H/pZS8aT/wC7l4FdoGojXpofVNHlzL23H0dqVLKNuFso6HXyCk4pmhI4fqo+us535eCaqDSGojf0B1815+raCI1broNR+iytxE6NceWU/NGNqbqcTrJHVNGKpT1538jCNpc7jytb+6jGsqsplwyk3sN1je+4b+SrdHb735ZAbfKQdzx71N3DMLtciLIx7AQCQCRZsiYGsDmtLF7aYxoIBc0ktLhow8HjUeKrtZocGguJEk0qhnMxwN2P328ws1N7jmNhU0e3dUH3hpm571LVMbjn1Zp1DkM5mOYSI5GD3h4LRxNYPcA7u1BaTo7hcf8AJZq+XISyXU9cpHfpnlvibT5qwdmez2WK1bvPvlBHujdM743c1n9G12a2QWgVqoHtCOo8TvMb1YERbkxBERUEREBY6+Ha9pa9oc06hwBHkVkRBUNsdgaFUH2ZNI7h7zPI3HQqgbe7FYmjLiwvAvnZf1Fx1C+3KFLNNfmyu13+YMx46OHUa9V9A+iXbNNj3YSTNTvNnWWgkjmIB8lfdrdmsNiP5tIT9pvdd5hVxv0dinVbWoYhzHs93M0GN2rS20SOqxObK1sXpF5ZMCdd8L0ujKApUBSgIiICIiAiIgIiICghSiDDVwzSCIA5gCRzVB7QtrUawucrzYfeiSBxB1HUbl9EXL2/swV6RG8XB4EafvxWeudiyqjgscWfDHHgOmnp1Vg2dj6L7PblIHvZjB477XWhQw+ZoJjPp4/pPz8V59gIJaYOhtp+JuoXHnqytVaBs+nw/wBx/uvf1JnD1P8AdYNi1JpNkyRaeK313jDXGCZ9kL0MKz7LfJZkVGP2LfsjyC9gKUQEREAql9p+zsO9rSbLHwyowWMEjK9vNpuORI00uiKD5a9j6bqjKglzbVALZwB3ajODwPMarzWxE5WkjOPcfoHt4Hh+hX06phmkkkAyADI1jTyk+a4tHsnQDiTLhnztG5vIcuSzeWpWh2W2OXFmJqS3WGHful3P5wreoAUrUmMiIioIiICIiAiIgIiICIiAiIggKVDVKAiIgIiICIiAiIgIiICIiDk43BgO4B5sfsu5/dd8/FcrGtLXQ+Wu+F438A7j4q1OaDYrHiMO14yuAI/eix1xqyud2fJLXExJOo0PPhvXWWDB4VtNuVogLOtc/hRERVBERAREQEREBERAREQEREBERAREQEREBERAREQEREEBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERB//Z">
+      <div class="card-header"><span>Llobarro / Lubina</span><small>+ 25 cm</small></div>
+      <div class="img-container"><img alt="Llobarro"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://museudelapesca.org/peixos/imatges__ori/scoesco.jpg">
+      <div class="card-header"><span>Cap‑roig / Cabracho</span><small>+ 30 cm</small></div>
+      <div class="img-container"><img alt="Cap‑roig"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.gastronomiavasca.net/uploads/image/file/3266/rape.jpg">
+      <div class="card-header"><span>Rap / Rape</span><small>+ 30 cm</small></div>
+      <div class="img-container"><img alt="Rap"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/8/89/Corvinas_negras_%28Sciaena_umbra%29%2C_Cabo_de_Palos%2C_Espa%C3%B1a%2C_2022-07-14%2C_DD_52.jpg">
+      <div class="card-header"><span>Escorball / Corvallo</span><small>+ 30 cm</small></div>
+      <div class="img-container"><img alt="Escorball"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://museudelapesca.org/peixos/imatges__ori/zeizefab.jpg">
+      <div class="card-header"><span>Gall de Sant Pere / Pez de Sant Pedro</span><small>+ 30 cm</small></div>
+      <div class="img-container"><img alt="Gall de Sant Pere"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.pescaderiascorunesas.es/sites/default/files/styles/imagen_de_ficha/public/2017-11/Besugo_2.jpg?itok=F8LjVQVb">
+      <div class="card-header"><span>Goràs / Besugo</span><small>+ 33 cm</small></div>
+      <div class="img-container"><img alt="Goràs"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://pecesmediterraneo.com/wp-content/uploads/2020/08/dentex_dentex_4.jpg">
+      <div class="card-header"><span>Déntol / Dentón</span><small>+ 35 cm</small></div>
+      <div class="img-container"><img alt="Déntol"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://media.istockphoto.com/id/1429645911/es/foto/pez-medregal-mayor-aislado-sobre-fondo-blanco.jpg?s=612x612&w=0&k=20&c=6Ey5MmqvTyOfgsvWA7cpKehKV7X1r1AB2vkb8KBpDjQ=">
+      <div class="card-header"><span>Verderol‑cirviola / Serviola</span><small>+ 35 cm</small></div>
+      <div class="img-container"><img alt="Serviola"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.fishipedia.es/wp-content/uploads/2020/06/DSC03086-scaled.jpg">
+      <div class="card-header"><span>Anfós / Mero</span><small>+ 45 cm</small></div>
+      <div class="img-container"><img alt="Mero"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Epinephelus_costae03.jpg">
+      <div class="card-header"><span>Anfós llis / Falso abadejo</span><small>+ 45 cm</small></div>
+      <div class="img-container"><img alt="Falso abadejo"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://pecesmediterraneo.com/wp-content/uploads/2020/09/mycteroperca_rubra_1.jpg">
+      <div class="card-header"><span>Anfós bord / Gitano</span><small>+ 45 cm</small></div>
+      <div class="img-container"><img alt="Gitano"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="data:image/jpeg;base64,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">
+      <div class="card-header"><span>Xerna / Mero dentón</span><small>+ 45 cm</small></div>
+      <div class="img-container"><img alt="Mero dentón"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTahWs0SqAcAOp8V1npRyIy97w-uPx2b8RFCg&s">
+      <div class="card-header"><span>Anfós blanc / Mero blanco</span><small>+ 45 cm</small></div>
+      <div class="img-container"><img alt="Mero blanco"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.conxemar.com/wp-content/uploads/2022/12/mustelus_mustelus._sw.jpeg">
+      <div class="card-header"><span>Mussoles / Musolas</span><small>+ 95 cm</small></div>
+      <div class="img-container"><img alt="Musolas"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/1/18/Bluefin-big.jpg">
+      <div class="card-header"><span>Tonyina / Atún rojo</span><small>+ 115 cm o 30 kg</small></div>
+      <div class="img-container"><img alt="Atún rojo"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/5/57/Octopus2.jpg">
+      <div class="card-header"><span>Pop de roca / Pulpo</span><small>+ 1 kg</small></div>
+      <div class="img-container"><img alt="Pulpo"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.pescaderiascorunesas.es/sites/default/files/styles/imagen_de_ficha/public/2017-11/erizo%20mar%201.jpg?itok=obOiNyID">
+      <div class="card-header"><span>Bogamarí comú / Erizo común</span><small>+ 5 cm</small></div>
+      <div class="img-container"><img alt="Erizo común"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://upload.wikimedia.org/wikipedia/commons/3/3a/Erizo_de_mar_viol%C3%A1ceo_%28Sphaerechinus_granularis%29%2C_Madeira%2C_Portugal%2C_2019-05-31%2C_DD_40.jpg">
+      <div class="card-header"><span>Bogamarí violeta / Erizo violáceo</span><small>+ 6 cm</small></div>
+      <div class="img-container"><img alt="Erizo violeta"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.aquariumbcn.com/wp-content/uploads/2022/08/Serranus-scriba.jpg">
+      <div class="card-header"><span>Vaca</span><small>+ 14 cm</small></div>
+      <div class="img-container"><img alt="Vaca"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://mordestefoods.com/images/producto/2022/05/11/246/full_pinto-merlo-pescado-mordeste.jpg">
+      <div class="card-header"><span>Tord flassader / Pinto</span><small>+ 18 cm</small></div>
+      <div class="img-container"><img alt="Pinto"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.jarife.org/contenido/especies/rascacio.jpg">
+      <div class="card-header"><span>Escórpora / Rascacio</span><small>+ 19 cm</small></div>
+      <div class="img-container"><img alt="Rascacio"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.cibsub.cat/rcs_gene/Spondyliosoma_cantharus04_1.jpg">
+      <div class="card-header"><span>Càntera / Chopa</span><small>+ 20 cm</small></div>
+      <div class="img-container"><img alt="Càntera"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.fishipedia.es/wp-content/uploads/2020/06/Labrus-merula.jpg">
+      <div class="card-header"><span>Tord massot / Merlo</span><small>+ 25 cm</small></div>
+      <div class="img-container"><img alt="Merlo"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://pecesmediterraneo.com/wp-content/uploads/2019/03/labrus_viridis_2.jpg ">
+      <div class="card-header"><span>Grívia / Bodión verd</span><small>+ 27 cm</small></div>
+      <div class="img-container"><img alt="Bodión verd"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+    <li data-img="https://www.fishipedia.es/wp-content/uploads/2021/08/Xyrichtys-novacula.jpg">
+      <div class="card-header"><span>Raor / Galán</span><small>No té talla mínima fixa</small></div>
+      <div class="img-container"><img alt="Raor"><div class="click-hint">Clic per veure</div></div>
+    </li>
+
+  </ul>
+</div>
+
+<script>
+  const listItems = document.querySelectorAll('#fishList li');
+  const totalCount = listItems.length;
+  const totalSpan = document.getElementById('totalCount');
+  const visibleSpan = document.getElementById('visibleCount');
+  const searchBox = document.getElementById('searchBox');
+
+  totalSpan.textContent = totalCount;
+  visibleSpan.textContent = totalCount;
+
+  listItems.forEach(item => {
+    const img = item.querySelector('img');
+    item.addEventListener('click', () => {
+      if (!img.classList.contains('show')) {
+        img.src = item.dataset.img;
+        img.classList.add('show');
+      } else {
+        img.classList.remove('show');
+      }
+    });
+  });
+
+  document.getElementById('toggleAll').addEventListener('click', () => {
+    let anyHidden = false;
+    listItems.forEach(item => {
+      const img = item.querySelector('img');
+      if (!img.classList.contains('show')) {
+        anyHidden = true;
+      }
+    });
+    listItems.forEach(item => {
+      const img = item.querySelector('img');
+      if (anyHidden) {
+        img.src = item.dataset-img; // esto estaba mal en el anterior
+        img.src = item.dataset.img;
+        img.classList.add('show');
+      } else {
+        img.classList.remove('show');
+      }
+    });
+  });
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.toLowerCase();
+    let visible = 0;
+    listItems.forEach(item => {
+      const name = item.querySelector('.card-header span').textContent.toLowerCase();
+      if (name.includes(q)) {
+        item.style.display = '';
+        visible++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    visibleSpan.textContent = visible;
+  });
+</script>
+
+</body>
+</html>
